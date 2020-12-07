@@ -21,11 +21,15 @@ void extract_frames(vector<frame_data*> &frame_list, string file_n) {
   for(int i = 0; i < num_frames; i++) {
     frame_data *frame = new frame_data();
     cap >> frame->mat;
+
+    // build frame data
     frame->frame_num = i;
+    frame->extract_features();
+
+    // Add to list
     frame_list.push_back(frame);
   }
 }
-
 
 void print_frames(vector<frame_data*> d) {
   for(const auto &f : d) {
@@ -37,8 +41,6 @@ void print_frames(vector<frame_data*> d) {
 int main(){
   vector<frame_data*> frames;
   extract_frames(frames, file_name);
-  //print_frames(frames);
-  //frames[0]->print_frame();
 
   for(int i = 0; i < num_frames; i++){
     imshow("Frame", frames.at(i)->mat);
