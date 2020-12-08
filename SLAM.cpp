@@ -7,44 +7,24 @@
 using namespace std;
 using namespace cv;
 
-string file_name = "vid.mp4";
-int num_frames = 100;
+string file_name = "360NOSCOPE.mp4";
+int num_frames = 10;
+int start_frame = 100;
 
-void extract_frames(vector<frame_data*> &frame_list, string file_n) {
-  VideoCapture cap(file_n);
-
-  if(!cap.isOpened()){
-    cout << "Error opening video stream or file" << endl;
-    exit(-1);
-  }
-
-  for(int i = 0; i < num_frames; i++) {
-    frame_data *frame = new frame_data();
-    cap >> frame->mat;
-
-    // build frame data
-    frame->frame_num = i;
-    frame->extract_features();
-
-    // Add to list
-    frame_list.push_back(frame);
-  }
-}
-
-void print_frames(vector<frame_data*> d) {
-  for(const auto &f : d) {
-    cout << "** Frame " << f->frame_num << "**" << endl;
-    cout << f->mat << endl;
-  }
-}
 
 int main(){
   vector<frame_data*> frames;
-  extract_frames(frames, file_name);
+  extract_frames(frames, file_name, num_frames, start_frame);
 
   for(int i = 0; i < num_frames; i++){
     imshow("Frame", frames.at(i)->mat);
-    char c=(char)waitKey(25);
+    char c=(char)waitKey(0);
+
+    // frame by frame
+    while(c != 27 && c != 'c'){
+      cout << c << endl;
+      c = (char)waitKey(0);
+    }
     if(c==27)
       break;
   }
