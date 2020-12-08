@@ -1,23 +1,26 @@
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include <iostream>
+//#include "helper.cpp"
 
 using namespace std;
 using namespace cv;
 
-RNG rng(12345);
-
 struct frame_data {
-  int frame_num;
-  Mat mat;
-  Mat des;
-  vector<Point2f> features;
-  std::vector<KeyPoint> key_points;
-  vector<vector<DMatch>> matches;
+  int frame_num; // Frame number
+  Mat mat; // the frame that will be displayed
+  Mat des; // the descriptor
+  vector<Point2f> features; // A list of features found by "goodFeaturesToTrck"
+  std::vector<KeyPoint> key_points; // a List of key points found by "orb->detect"
+  vector<vector<DMatch>> matches; // A list of matched descriptors
+
+  /* prints frame meta data */
   void print_frame() {
     cout << "** Frame " << frame_num << "**" << endl;
     cout << mat << endl;
   }
+
+  /* extracts feature data from mat */
   void extract_features() {
     Mat mat_gray;
     cvtColor(mat, mat_gray, COLOR_BGR2GRAY);
@@ -44,6 +47,8 @@ struct frame_data {
           0);
     }
   }
+
+  /* extracts descriptors from mat */
   void extract_descriptors() {
     auto orb = ORB::create();
     orb->detect(mat, key_points);
@@ -63,7 +68,7 @@ void match_frames(frame_data *f1, frame_data *f2) {
   // Change 1 -> N for better results
   bf.knnMatch(f1->des, f2->des, f1->matches, 1);
 
-  cout << f1->matches.size() << endl;
+  //cout << f1->matches.size() << endl;
 }
 
 

@@ -10,7 +10,7 @@ all: msg main
 msg:
 	@echo '--- C++14 ---'
 
-main: SLAM.cpp frame.cpp
+main: SLAM.cpp frame.cpp helper.cpp point.cpp
 	${CXX} ${CXXFLAGS} -O2 -o $@ $< ${SDL2FLAGS} ${OPENCV2FLAGS}
 
 small: SLAM.cpp
