@@ -9,9 +9,9 @@
 using namespace std;
 using namespace cv;
 
-string file_name = "360NOSCOPE.mp4";
-int num_frames = 10;
-int start_frame = 100;
+string file_name = "test_drone.mp4";
+int num_frames = 200;
+int start_frame = 0;
 
 
 int main(){
@@ -22,12 +22,11 @@ int main(){
   convert2D_to_3D(frames, &p);
 
   for(int i = 0; i < num_frames; i++){
-    imshow("Frame", frames.at(i)->mat);
+    imshow("Frame", frames.at(i)->matched_mat);
     char c=(char)waitKey(0);
 
     // frame by frame
     while(c != 27 && c != 'c'){
-      cout << c << endl;
       c = (char)waitKey(0);
     }
     if(c==27)
