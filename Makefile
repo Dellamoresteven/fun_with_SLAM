@@ -11,7 +11,7 @@ msg:
 	@echo '--- C++14 ---'
 
 main: SLAM.cpp frame.cpp helper.cpp point.cpp
-	${CXX} ${CXXFLAGS} -O2 -o $@ $< ${SDL2FLAGS} ${OPENCV2FLAGS}
+	${CXX} ${CXXFLAGS} -O2 -I /usr/local/include/eigen3 -o $@ $< ${SDL2FLAGS} ${OPENCV2FLAGS}
 
 small: SLAM.cpp
 	${CXX} ${CXXFLAGS} -Os -o main $< ${SDL2FLAGS}

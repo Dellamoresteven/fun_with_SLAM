@@ -1,7 +1,11 @@
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include <iostream>
-//#include "helper.cpp"
+#include "settings.cpp"
+
+#include <Eigen/Eigen>
+
+using namespace Eigen;
 
 using namespace std;
 using namespace cv;
@@ -91,43 +95,65 @@ void match_frames(frame_data *f1, frame_data *f2) {
   // Change 1 -> N for better results
   bf.knnMatch(f1->des, f2->des, f1->matches, 1);
 
+  // draws matches between each frame. Only show the top matches_displayed
   int matches_displayed = 20;
   vector<vector<DMatch>> copy_matches;
-  for (int i=0; i < matches_displayed; i++) 
+  for (int i=0; i < matches_displayed; i++)
     copy_matches.push_back(f1->matches[i]);
-  // draws matches between each frame. Only show the top matches_displayed
-  drawMatches(f1->mat, f1->key_points, f2->mat, f2->key_points, copy_matches, f1->matched_mat);
+  //drawMatches(f1->mat, f1->key_points, f2->mat, f2->key_points, copy_matches, f1->matched_mat);
 
   cout << "Feature Matches: " << f1->matches.size() << " / " << max(f1->key_points.size(), f2->key_points.size()) << endl;
 }
 
 
-void extract_frames(vector<frame_data*> &frame_list, string file_n, int num_frames, int start_frame) {
-  VideoCapture cap(file_n);
+void extract_frames(vector<frame_data*> &frame_list) {
+  VideoCapture cap(settings::file_name);
+  //cout << "F: " << cap.get(CAP_PROP_FRAME_COUNT) << endl;
+
+  // Setting H and W
+  settings::camera_int::W = cap.get(CAP_PROP_FRAME_WIDTH);
+  settings::camera_int::H = cap.get(CAP_PROP_FRAME_HEIGHT);
+
+  // Downsize the W and H if it's > max_W
+  if(cap.get(CAP_PROP_FRAME_WIDTH) > settings::camera_int::max_W) {
+    float d = settings::camera_int::max_W / settings::camera_int::W;
+    settings::camera_int::F *= d;
+    settings::camera_int::H = int(d * settings::camera_int::H);
+    settings::camera_int::W = settings::camera_int::max_W;
+  }
+
+  {
+    using namespace settings::camera_int;
+    // Build the camera matrix K
+    K << F, 0, W/2,
+         0, F, H/2,
+         0, 0, 1;
+  }
+  cout << "K: " << settings::camera_int::K << endl;
+  //auto K_inv = settings::camera_int::K.inverse();
+  //cout << "K_inv: " << K_inv << endl;
+
 
   if(!cap.isOpened()) {
     cout << "Error opening video stream or file" << endl;
     exit(-1);
   }
 
-  for(int i = 0; i < num_frames + start_frame; i++) {
-    if(i >= start_frame) {
+  for(int i = 0; i < settings::num_frames + settings::start_frame; i++) {
+    if(i >= settings::start_frame) {
       cout << "** Processing frame " << i << " **" << endl;
       frame_data *frame = new frame_data();
       Mat full_size;
       cap >> full_size;
-      resize(full_size, frame->mat, Size(), 0.4, 0.4);
+      resize(full_size, frame->mat, Size(settings::camera_int::W,settings::camera_int::H));
 
       // build frame data
       frame->frame_num = i;
       frame->extract_features();
       frame->extract_descriptors();
       frame->draw_circles_on_frame();
-      if(i != start_frame) {
-        //cout << i << endl;
-        //cout << frame_list[i-start_frame-1]->frame_num << endl;
-        //cout << frame->frame_num << endl;
-        match_frames(frame_list[i - start_frame - 1], frame);
+      if(i != settings::start_frame) {
+        match_frames(frame_list[i - settings::start_frame - 1], frame);
       }
 
       // Add to list

@@ -1,28 +1,28 @@
 #include "opencv2/opencv.hpp"
 #include <iostream>
-#include "frame.cpp"
 #include <string>
 #include <vector>
+#include "frame.cpp"
 #include "point.cpp"
 #include "helper.cpp"
+//#include "settings.cpp"
 
 using namespace std;
 using namespace cv;
 
-string file_name = "test_drone.mp4";
-int num_frames = 200;
-int start_frame = 0;
 
+// huge credit to this post on stack overflow
+// https://stackoverflow.com/questions/2135116/how-can-i-determine-distance-from-an-object-in-a-video#:~:text=When%20you%20have%20moving%20video,object%20from%20slightly%20different%20angles.
 
 int main(){
   vector<frame_data*> frames;
-  extract_frames(frames, file_name, num_frames, start_frame);
+  extract_frames(frames);
 
   vector<point3d::Point3D> p;
-  convert2D_to_3D(frames, &p);
+  //convert2D_to_3D(frames, &p);
 
-  for(int i = 0; i < num_frames; i++){
-    imshow("Frame", frames.at(i)->matched_mat);
+  for(int i = 0; i < settings::num_frames; i++){
+    imshow("Frame", frames.at(i)->mat);
     char c=(char)waitKey(0);
 
     // frame by frame
