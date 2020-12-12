@@ -10,8 +10,8 @@ namespace point3d {
   // A Point is a 3D point on the space-time continuum
   class Point3D {
     private:
-      vector<Point3d> map;
     public:
+      vector<Point3d> map;
 
     Point3D() {
       cout << "building point" << endl;

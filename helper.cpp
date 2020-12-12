@@ -15,18 +15,24 @@ point3d::Point3D convert2D_to_3D(vector<frame_data*> f, vector<point3d::Point3D>
 float triangulate(KeyPoint one, KeyPoint two, int Y) {
   cout << "    triangulate: (" << one.pt.x << "," << one.pt.y << ")  (" << two.pt.x << "," << two.pt.y << ")" << endl;
 
-  // Build theta from one.pt and two.pt
-  Point2f P1(0,0);
-  //Point2f P1(settings::camera_int::W/2,settings::camera_int::H/2);
+  // Point2f P1(0,0);
+  Point2f P1(settings::camera_int::W/2,settings::camera_int::H/2);
   Point2f P2(one.pt);
   Point2f P3(two.pt);
-  float theta = atan2(P3.y - P1.y, P3.x - P1.x) -
-                atan2(P2.y - P1.y, P2.x - P1.x);
-  theta = abs(theta);
-  cout << "    theta: " << theta << " R" << endl;
-  float H = Y / sin(theta);
-  cout << "    Hyp: " << H << " meters" << endl;
-  return H;
+
+  // This is not a valid solution :(
+  //float theta = atan2(P3.y - P1.y, P3.x - P1.x) -
+                //atan2(P2.y - P1.y, P2.x - P1.x);
+  //theta = abs(theta);
+  //cout << "    theta: " << theta << " R" << endl;
+  //float H = Y / sin(theta);
+  //cout << "    Hyp: " << H << " meters" << endl;
+
+  // HACK DEELETE
+  float dist = sqrt(pow((P2.x-P3.x), 2) + pow((P2.y-P3.y), 2));
+  cout << "    dist: " << dist << endl;
+  // END HACK
+  return dist;
 
 }
 
@@ -45,15 +51,41 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
         cout << "Found match for kp " << j << " on frame " << i << endl;
         int idx1 = matches.at(j).x;
         int idx2 = matches.at(j).y;
-        //cout << "IDX: " << idx1 << ":" << idx2 << endl;
-        //cout << f1->key_points.size() << ":" << f2->key_points.size() << endl;
         float dis = triangulate(f1->key_points.at(idx2), f2->key_points.at(idx1), Y);
-        //if(dis <= 1500){
+        if(dis >= 1 && dis <= 60){
           p->add_point(Point3d(f2->key_points.at(idx1).pt.x, f2->key_points.at(idx1).pt.y, dis));
-        //}
+        } else {
+          cout << "Distance too large: " << dis << " for point (" << f2->key_points.at(idx1).pt.x << "," << f2->key_points.at(idx1).pt.y << ")" << endl;
+        }
       } else {
         cout << "No match for kp " << j << " on frame " << i << endl;
       }
     }
   }
+  vector<Scalar> colors{
+    Scalar(255,0,0),
+    Scalar(255,255,0),
+    Scalar(0,255,0),
+    Scalar(0,255,255),
+    Scalar(0,0,255),
+    Scalar(255,0,255)
+  };
+  cout << "SIZE: " << p->map.size() << endl;
+  for(const auto pp : p->map) {
+    Point2f pts(pp.x, pp.y);
+    cout << "DIST: " << pp.z << endl;
+    circle(
+      f.at(30)->mat,
+      pts,
+      2,
+       colors.at(int(pp.z)/8),
+      //Scalar(255,255,0),
+      -1,
+      8,
+      0);
+  }
+  //cout << "MAX: " << max << endl;
 }
+
+// 1484,938 1468,926,1484,938 // BOAT
+// 1491,954 1474,941,1491,954 // BOAT
