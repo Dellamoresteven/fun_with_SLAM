@@ -1,7 +1,7 @@
 CXX?=c++
 SDL2FLAGS=$(shell pkg-config sdl2 --cflags --libs)
 OPENCV2FLAGS=$(shell pkg-config opencv --cflags --libs)
-CXXFLAGS?=-std=c++14 -Wall -pedantic -Werror -Wshadow -Wstrict-aliasing -Wstrict-overflow
+CXXFLAGS?=-std=c++14 -Wall -pedantic -Wshadow -Wstrict-aliasing -Wstrict-overflow
 
 .PHONY: all msg clean fullclean
 

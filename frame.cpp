@@ -44,16 +44,16 @@ struct frame_data {
 
   /* draws circles on the frames mat */
   void draw_circles_on_frame() {
-    //for( size_t i = 0; i < features.size(); i++ ) {
-      //circle(
-          //mat,
-          //features[i],
-          //2,
-          //Scalar(0,255,0),
-          //-1,
-          //8,
-          //0);
-    //}
+    for( size_t i = 0; i < features.size(); i++ ) {
+      circle(
+          mat,
+          key_points[i].pt,
+          2,
+          Scalar(0,255,0),
+          -1,
+          8,
+          0);
+    }
     auto plotPoint = [&](int x1, int y1, int x2, int y2){
         circle(
           mat,
@@ -81,11 +81,11 @@ struct frame_data {
         //cout << "c: " << (int(key_points[i].pt.y) / 100) << endl;
         //c = colors.at(int(key_points[i].pt.y) / 50);
       //} catch(exception e) {}
-      plotPoint(327,581,320,580);
-      plotPoint(1078,456,1080,452);
-      plotPoint(1064,521,1066,518);
-      plotPoint(195,663,181,665);
-      plotPoint(345,957,322,971);
+      //plotPoint(327,581,320,580);
+      //plotPoint(1078,456,1080,452);
+      //plotPoint(1064,521,1066,518);
+      //plotPoint(195,663,181,665);
+      //plotPoint(345,957,322,971);
     }
   }
 

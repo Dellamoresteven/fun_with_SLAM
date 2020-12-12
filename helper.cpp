@@ -48,9 +48,9 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
         //cout << "IDX: " << idx1 << ":" << idx2 << endl;
         //cout << f1->key_points.size() << ":" << f2->key_points.size() << endl;
         float dis = triangulate(f1->key_points.at(idx2), f2->key_points.at(idx1), Y);
-        if(dis <= 1500){
+        //if(dis <= 1500){
           p->add_point(Point3d(f2->key_points.at(idx1).pt.x, f2->key_points.at(idx1).pt.y, dis));
-        }
+        //}
       } else {
         cout << "No match for kp " << j << " on frame " << i << endl;
       }
