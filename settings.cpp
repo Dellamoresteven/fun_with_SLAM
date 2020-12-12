@@ -7,7 +7,7 @@ using namespace std;
 
 namespace settings {
   string file_name = "test_drone.mp4";
-  int num_frames = 30;
+  int num_frames = 40;
   int start_frame = 0;
 
   namespace camera_int {

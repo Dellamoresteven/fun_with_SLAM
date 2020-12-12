@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 using namespace cv;
@@ -13,6 +14,20 @@ point3d::Point3D convert2D_to_3D(vector<frame_data*> f, vector<point3d::Point3D>
 
 float triangulate(KeyPoint one, KeyPoint two, int Y) {
   cout << "    triangulate: (" << one.pt.x << "," << one.pt.y << ")  (" << two.pt.x << "," << two.pt.y << ")" << endl;
+
+  // Build theta from one.pt and two.pt
+  Point2f P1(0,0);
+  //Point2f P1(settings::camera_int::W/2,settings::camera_int::H/2);
+  Point2f P2(one.pt);
+  Point2f P3(two.pt);
+  float theta = atan2(P3.y - P1.y, P3.x - P1.x) -
+                atan2(P2.y - P1.y, P2.x - P1.x);
+  //theta /= 2*M_PI;
+  //theta *= 360;
+  theta = abs(theta);
+  cout << "    theta: " << theta << " R" << endl;
+  float H = Y / sin(theta);
+  cout << "    Hyp: " << H << " meters" << endl;
   return 0.0;
 
 }
@@ -20,10 +35,10 @@ float triangulate(KeyPoint one, KeyPoint two, int Y) {
 // This is a solution if we can get the speed of the camera.
 void convert2D_to_3D_with_SPEED(vector<frame_data*> f, vector<point3d::Point3D> *p) {
   // Y is in meters
-  float Y = 17.8816 / settings::camera_int::frame_rate;
+  float Y = 17.8816;
   cout << "Y: " << Y << endl;
-  for(size_t i = 1; i < f.size(); i += 1) {
-    frame_data * f1 = f.at(i-1);
+  for(size_t i = 30; i < f.size(); i += 30) {
+    frame_data * f1 = f.at(i-30);
     frame_data * f2 = f.at(i);
     auto matches = match_frames(f2, f1);
     for(size_t j = 0; j < matches.size(); j++) {

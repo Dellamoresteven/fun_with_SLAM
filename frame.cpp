@@ -54,16 +54,39 @@ struct frame_data {
           //8,
           //0);
     //}
-    //for( size_t i = 0; i < key_points.size(); i++ ) {
-      //circle(
-          //mat,
+    auto plotPoint = [&](int x1, int y1, int x2, int y2){
+        circle(
+          mat,
           //key_points[i].pt,
-          //2,
-          //Scalar(0,255,0),
-          //-1,
-          //8,
-          //0);
-    //}
+          Point2f(x1, y1),
+          2,
+          Scalar(0,0,255),
+          -1,
+          8,
+          0);
+        circle(
+          mat,
+          //key_points[i].pt,
+          Point2f(x2, y2),
+          2,
+          Scalar(0,255,0),
+          -1,
+          8,
+          0);
+    };
+    //vector<Scalar> colors { Scalar(255,0,0), Scalar(255,50,0), Scalar(255,100,0), Scalar(255,150,0), Scalar(255,255,0), Scalar(0,255,0), Scalar(0,255,50), Scalar(0,255,100), Scalar(0,255,150), Scalar(0,255,255), Scalar(0,0, 255) };
+    for( size_t i = 0; i < key_points.size(); i++ ) {
+      //Scalar c(0,0,0);
+      //try {
+        //cout << "c: " << (int(key_points[i].pt.y) / 100) << endl;
+        //c = colors.at(int(key_points[i].pt.y) / 50);
+      //} catch(exception e) {}
+      plotPoint(327,581,320,580);
+      plotPoint(1078,456,1080,452);
+      plotPoint(1064,521,1066,518);
+      plotPoint(195,663,181,665);
+      plotPoint(345,957,322,971);
+    }
   }
 
   /* extracts descriptors from mat */

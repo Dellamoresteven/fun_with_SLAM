@@ -29,6 +29,12 @@ int main(){
     while(c != 27 && c != 'c'){
       c = (char)waitKey(0);
     }
+    while(i == 30 && c != 'r') {
+      c = (char)waitKey(0);
+    }
+    if(c == 'r'){
+      i = 0;
+    }
     if(c==27)
       break;
   }
