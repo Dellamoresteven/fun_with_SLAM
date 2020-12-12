@@ -22,22 +22,21 @@ float triangulate(KeyPoint one, KeyPoint two, int Y) {
   Point2f P3(two.pt);
   float theta = atan2(P3.y - P1.y, P3.x - P1.x) -
                 atan2(P2.y - P1.y, P2.x - P1.x);
-  //theta /= 2*M_PI;
-  //theta *= 360;
   theta = abs(theta);
   cout << "    theta: " << theta << " R" << endl;
   float H = Y / sin(theta);
   cout << "    Hyp: " << H << " meters" << endl;
-  return 0.0;
+  return H;
 
 }
 
 // This is a solution if we can get the speed of the camera.
-void convert2D_to_3D_with_SPEED(vector<frame_data*> f, vector<point3d::Point3D> *p) {
+void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
   // Y is in meters
   float Y = 17.8816;
   cout << "Y: " << Y << endl;
   for(size_t i = 30; i < f.size(); i += 30) {
+    cout << "FEWAFEWAFWEAFWEAFWEA" << endl;
     frame_data * f1 = f.at(i-30);
     frame_data * f2 = f.at(i);
     auto matches = match_frames(f2, f1);
@@ -48,9 +47,10 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, vector<point3d::Point3D> 
         int idx2 = matches.at(j).y;
         //cout << "IDX: " << idx1 << ":" << idx2 << endl;
         //cout << f1->key_points.size() << ":" << f2->key_points.size() << endl;
-        triangulate(f1->key_points.at(idx2), f2->key_points.at(idx1), Y);
-        //cout << "size: " << f1->matches.at(i).size() << endl;
-        //cout << f1->matches.at(j).at(0).distance << ":" << f1->matches.at(j).at(0).imgIdx << ":" << f1->matches.at(j).at(0).queryIdx << ":" << f1->matches.at(j).at(0).trainIdx << endl;
+        float dis = triangulate(f1->key_points.at(idx2), f2->key_points.at(idx1), Y);
+        if(dis <= 1500){
+          p->add_point(Point3d(f2->key_points.at(idx1).pt.x, f2->key_points.at(idx1).pt.y, dis));
+        }
       } else {
         cout << "No match for kp " << j << " on frame " << i << endl;
       }
