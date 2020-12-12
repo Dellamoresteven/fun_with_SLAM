@@ -17,7 +17,6 @@ struct frame_data {
   Mat matched_mat;
   vector<Point2f> features; // A list of features found by "goodFeaturesToTrck"
   std::vector<KeyPoint> key_points; // a List of key points found by "orb->detect"
-  vector<vector<DMatch>> matches; // A list of matched descriptors
 
   /* prints frame meta data */
   void print_frame() {
@@ -84,25 +83,33 @@ struct frame_data {
 };
 
 
-void match_frames(frame_data *f1, frame_data *f2) {
-  // Should do Lowe's ratio test on the result of the knnMatch search instead
-  // of just asking for one. @TODO
+vector<Point2f> match_frames(frame_data *f1, frame_data *f2) {
+  BFMatcher bf(NORM_HAMMING, false);
 
-
-  // prob should change to flase and look through all the returns.
-  BFMatcher bf(NORM_HAMMING, true);
-
-  // Change 1 -> N for better results
-  bf.knnMatch(f1->des, f2->des, f1->matches, 1);
+  vector<vector<DMatch>> matches;
+  bf.knnMatch(f1->des, f2->des, matches, 2);
 
   // draws matches between each frame. Only show the top matches_displayed
-  int matches_displayed = 20;
-  vector<vector<DMatch>> copy_matches;
-  for (int i=0; i < matches_displayed; i++)
-    copy_matches.push_back(f1->matches[i]);
+  //int matches_displayed = 20;
+  //vector<vector<DMatch>> copy_matches;
+  //for (int i=0; i < matches_displayed; i++)
+    //copy_matches.push_back(f1->matches[i]);
   //drawMatches(f1->mat, f1->key_points, f2->mat, f2->key_points, copy_matches, f1->matched_mat);
 
-  cout << "Feature Matches: " << f1->matches.size() << " / " << max(f1->key_points.size(), f2->key_points.size()) << endl;
+  vector<Point2f> ret;
+
+  for(const auto m : matches) {
+    if(m.at(0).distance < 0.75*m.at(1).distance) {
+      Point2f pt(m.at(0).queryIdx, m.at(0).trainIdx);
+      if(m.at(0).distance < 32) {
+        ret.push_back(pt);
+      }
+    }
+  }
+
+  cout << "Feature Matches: " << ret.size() << " / " << max(f1->key_points.size(), f2->key_points.size()) << endl;
+
+  return ret;
 }
 
 
@@ -123,8 +130,14 @@ void extract_frames(vector<frame_data*> &frame_list) {
   }
 
   {
+    /*
+     * P =
+     * f 0 px 0
+     * 0 f py 0
+     * 0 0 1  0
+     */
     using namespace settings::camera_int;
-    // Build the camera matrix K
+    // Build the camera intrinsics matrix K
     K << F, 0, W/2,
          0, F, H/2,
          0, 0, 1;
@@ -152,9 +165,9 @@ void extract_frames(vector<frame_data*> &frame_list) {
       frame->extract_features();
       frame->extract_descriptors();
       frame->draw_circles_on_frame();
-      if(i != settings::start_frame) {
-        match_frames(frame_list[i - settings::start_frame - 1], frame);
-      }
+      //if(i != settings::start_frame) {
+        //match_frames(frame_list[i - settings::start_frame - 1], frame);
+      //}
 
       // Add to list
       frame_list.push_back(frame);

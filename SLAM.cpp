@@ -19,7 +19,7 @@ int main(){
   extract_frames(frames);
 
   vector<point3d::Point3D> p;
-  //convert2D_to_3D(frames, &p);
+  convert2D_to_3D_with_SPEED(frames, &p);
 
   for(int i = 0; i < settings::num_frames; i++){
     imshow("Frame", frames.at(i)->mat);
