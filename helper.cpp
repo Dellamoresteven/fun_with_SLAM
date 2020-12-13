@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <random>
 
 using namespace std;
 using namespace cv;
@@ -30,9 +31,17 @@ float triangulate(KeyPoint one, KeyPoint two, int Y) {
 
   // HACK DEELETE
   float dist = sqrt(pow((P2.x-P3.x), 2) + pow((P2.y-P3.y), 2));
-  cout << "    dist: " << dist << endl;
+  //std::normal_distribution<> distribution{5,2};
+  //cout << distribution(5);
+  int dis_from_center = abs(P3.x - settings::camera_int::W/2);
+  //float c = 1.0 / dis_from_center;
+  //c *= 10000;
+  float c = pow(dis_from_center,2) * 1/40000.0;
+  cout << "    dist_from_center: " << dis_from_center << endl;
+  cout << "    c: " << c << endl;
+  cout << "    dist: " << dist - c << endl;
   // END HACK
-  return dist;
+  return dist - c;
 
 }
 
@@ -42,7 +51,6 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
   float Y = 17.8816;
   cout << "Y: " << Y << endl;
   for(size_t i = 30; i < f.size(); i += 30) {
-    cout << "FEWAFEWAFWEAFWEAFWEA" << endl;
     frame_data * f1 = f.at(i-30);
     frame_data * f2 = f.at(i);
     auto matches = match_frames(f2, f1);
@@ -52,11 +60,11 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
         int idx1 = matches.at(j).x;
         int idx2 = matches.at(j).y;
         float dis = triangulate(f1->key_points.at(idx2), f2->key_points.at(idx1), Y);
-        if(dis >= 1 && dis <= 60){
+        //if(dis >= 1 && dis <= 60){
           p->add_point(Point3d(f2->key_points.at(idx1).pt.x, f2->key_points.at(idx1).pt.y, dis));
-        } else {
-          cout << "Distance too large: " << dis << " for point (" << f2->key_points.at(idx1).pt.x << "," << f2->key_points.at(idx1).pt.y << ")" << endl;
-        }
+        //} else {
+          //cout << "Distance too large: " << dis << " for point (" << f2->key_points.at(idx1).pt.x << "," << f2->key_points.at(idx1).pt.y << ")" << endl;
+        //}
       } else {
         cout << "No match for kp " << j << " on frame " << i << endl;
       }
@@ -68,17 +76,30 @@ void convert2D_to_3D_with_SPEED(vector<frame_data*> f, point3d::Point3D *p) {
     Scalar(0,255,0),
     Scalar(0,255,255),
     Scalar(0,0,255),
-    Scalar(255,0,255)
+    Scalar(255,0,255),
   };
   cout << "SIZE: " << p->map.size() << endl;
   for(const auto pp : p->map) {
     Point2f pts(pp.x, pp.y);
-    cout << "DIST: " << pp.z << endl;
+    Scalar c(0,0,0);
+    if(int(pp.z) > 7) {
+      c = Scalar(0,255,0);
+    } else if(int(pp.z) > 3) {
+      c = Scalar(0,0,255);
+    } else if(int(pp.z) > 0) {
+      c = Scalar(255,0,0);
+    } else if(int(pp.z) > -3) {
+      c = Scalar(0,255,255);
+    }
+    //try {
+      //c = colors.at(int(pp.z)/15);
+    //} catch(Exception e){}
+    //cout << "DIST: " << pp.z << endl;
     circle(
       f.at(30)->mat,
       pts,
       2,
-       colors.at(int(pp.z)/8),
+      c,
       //Scalar(255,255,0),
       -1,
       8,
